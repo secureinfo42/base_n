@@ -24,7 +24,12 @@ import base91
 import base92
 from base128 import base128
 import base256
-import base2048
+BASE2048_ENABLED=1
+try:
+  import base2048
+except:
+  BASE2048_ENABLED=0
+  pass
 import base65536
 import base114514
 
@@ -221,9 +226,9 @@ def basenc(data,base="64",op="-e"):
   ### Base2048 ########################################################################################################
 
   if base == "2048":
-
-    if op == "-e": return( base2048.encode(data) );
-    else: return( base2048.decode(data.decode()) )
+    if BASE2048_ENABLED:
+      if op == "-e": return( base2048.encode(data) );
+      else: return( base2048.decode(data.decode()) )
 
   ### Base65536 #######################################################################################################
 
@@ -419,7 +424,8 @@ if op == "decode":
       exit(65) # like base64
   if type(out) is str:
     out = out.encode()
-  stdout.buffer.write(out)
+  if out:
+    stdout.buffer.write(out)
 
 if op == "list":
   print( ' '.join(BASES))
@@ -455,4 +461,5 @@ if op == "brute":
       except:
         print("[ {} ] base%-6s : {}FAILED{}".format(KO,C_RED,C_RESET) % base)
         pass
+
 
