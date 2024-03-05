@@ -8,6 +8,8 @@ Encode and decode in several encoding base.
 
 See my fork of base62 for Python3 patch
 
+Note: base2048 work on Darwin (macOS) not Linux, try it by yourself
+
 ## Synopsis
 
 ```
