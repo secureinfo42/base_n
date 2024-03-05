@@ -6,6 +6,8 @@ Encode and decode in several encoding base.
 
 `pip3 install -r requirements.txt`
 
+See my fork of base62 for Python3 patch
+
 ## Synopsis
 
 ```
