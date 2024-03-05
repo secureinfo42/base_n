@@ -18,12 +18,15 @@ import colorama
 import base64 # base16, base32, base85
 import base36
 import base45
+import base58
 import base62
 import base91
 import base92
 from base128 import base128
 import base256
+import base2048
 import base65536
+import base114514
 
 APP=argv[0].split("/")[-1]
 C_GREEN = colorama.Fore.GREEN
@@ -40,7 +43,9 @@ VERBOSE = 0 # Show hexa dump when bruteforce
 #
 ##
 
-BASES = ["16","32","45","62","64","85","128","256","65536"]
+# 62 excluded because decode only integer
+BASES = ["16","32","45","58","64","85","128","256","2048","65536","114514"]
+# BASES = ["16","32","45","62","64","85","128","256","2048","65536","114514"]
 
 EXEMPLES="""
 Exemples :
@@ -82,6 +87,9 @@ r = basenc('ňťŬŬůĊ',"256","-d")
 
 r = basenc(b"Hello","65536")          # base 65535
 r = basenc("驈ꍬᕯ","65536","-d") 
+
+r = basenc(b"Hello","base114514")          # base 114514
+r = basenc("15545114154555154145511455444511","base114514","-d") 
 """
 
 def basenc(data,base="64",op="-e"):
@@ -116,6 +124,13 @@ def basenc(data,base="64",op="-e"):
 
     if op == "-e": return( base45.b45encode(data) )
     else: return( base45.b45decode(data) )
+
+  ### Base58 ##########################################################################################################
+
+  if base == "58":
+
+    if op == "-e": return( base58.b58encode(data) )
+    else: return( base58.b58decode(data) )
 
   ### Base62 ##########################################################################################################
 
@@ -203,12 +218,26 @@ def basenc(data,base="64",op="-e"):
     remove(tmpfile)
     return(buff)
 
+  ### Base2048 ########################################################################################################
+
+  if base == "2048":
+
+    if op == "-e": return( base2048.encode(data) );
+    else: return( base2048.decode(data.decode()) )
+
   ### Base65536 #######################################################################################################
 
   if base == "65536":
 
     if op == "-e": return( base65536.encode(data) );
     else: return( base65536.decode(data.decode()) )
+
+  ### Base114514 ######################################################################################################
+
+  if base == "114514":
+
+    if op == "-e": return( base114514.b114514encode(data) );
+    else: return( base114514.b114514decode(data.decode()) )
 
 
 
@@ -237,10 +266,11 @@ Usage:
 
   %s <-H|-h> | <-b base> <-d|-r|-e> <-f file|->
 
-  -b # : base number : 16, 32, 45, 62, 64, 85, 91, 92, 128, 256, 65536
+  -b # : base number : 16, 32, 45, 58, 62, 64, 85, 91, 92, 128, 256, 2048, 65536, 114514
   -d   : decode
   -r   : bruteforce decode (try all base)
   -e   : encode
+  -l   : list base (62 is excluded since mechanism is different)
 
 Notes:
 
@@ -262,7 +292,7 @@ Exemples:
   # Encode string
   printf 'myPasswordisverylongandsecret'|%s
 
-  # Base62 test
+  # Base62 test (decode string, encode integer)
   echo test|%s -b 62 -d|%s -b 62
 """
 
@@ -408,7 +438,7 @@ if op == "brute":
         out = basenc(data.strip(),base,"-d")
         ok  = 1
       except:
-        print("[ {} ] base%-5s : {}FAILED{}".format(KO,C_RED,C_RESET) % base)
+        print("[ {} ] base%-6s : {}FAILED{}".format(KO,C_RED,C_RESET) % base)
         pass
 
     if ok == 1:
@@ -416,13 +446,13 @@ if op == "brute":
         if len(out) > 2:
           if VERBOSE == 1:
             print("")
-          print("[ {} ] base%-5s : {}PASSED{}".format(OK,C_GREEN,C_RESET) % base)
+          print("[ {} ] base%-6s : {}PASSED{}".format(OK,C_GREEN,C_RESET) % base)
           if VERBOSE == 1:
             print("-----------------")
             print("{}".format(hexdump(out)))
         else:
-          print("[ {} ] base%-5s : {}FAILED{}".format(KO,C_RED,C_RESET) % base)
+          print("[ {} ] base%-6s : {}FAILED{}".format(KO,C_RED,C_RESET) % base)
       except:
-        print("[ {} ] base%-5s : {}FAILED{}".format(KO,C_RED,C_RESET) % base)
+        print("[ {} ] base%-6s : {}FAILED{}".format(KO,C_RED,C_RESET) % base)
         pass
 
